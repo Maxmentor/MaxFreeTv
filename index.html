@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MaxFreeTV</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dark">
+
+<header>
+  <h1>MaxFreeTV</h1>
+  <a class="slogan" href="https://github.com/Maxmentor" target="_blank">
+    by Maxmentor
+  </a>
+  <button id="mode">🌙 / ☀️</button>
+</header>
+
+<input type="text" id="search" placeholder="Search channel...">
+
+<div id="channels"></div>
+
+<script>
+let allChannels = [];
+
+// Load the M3U file
+fetch('https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/in.m3u')
+  .then(res => res.text())
+  .then(data => {
+    allChannels = parseM3U(data);
+    render(allChannels);
+  });
+
+// Parse M3U text
+function parseM3U(text) {
+  const lines = text.split(/\r?\n/);
+  const channels = [];
+  for(let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if(line.startsWith('#EXTINF:')) {
+      // Get metadata
+      const info = line.match(/#EXTINF:-?\d+.*?,(.*)/);
+      const name = info ? info[1].trim() : 'No Name';
+
+      const logoMatch = line.match(/tvg-logo="(.*?)"/);
+      const logo = logoMatch ? logoMatch[1] : 'https://www.freeiconspng.com/thumbs/television-icon/tv-icon-13.png';
+
+      // The next line should be the URL
+      const url = lines[i+1] ? lines[i+1].trim() : '';
+      
+      channels.push({ name, logo, url });
+      i++; // skip URL line
+    }
+  }
+  return channels;
+}
+
+// Render channels
+function render(list){
+  const box = document.getElementById('channels');
+  box.innerHTML = '';
+  list.forEach(ch => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/70'">
+      <p>${ch.name}</p>
+    `;
+    div.onclick = () => {
+      location.href = `player.html?src=${encodeURIComponent(ch.url)}`;
+    };
+    box.appendChild(div);
+  });
+}
+
+// Search filter
+document.getElementById('search').addEventListener('input', e => {
+  const v = e.target.value.toLowerCase();
+  render(allChannels.filter(c => c.name.toLowerCase().includes(v)));
+});
+
+// Light/Dark mode toggle
+document.getElementById('mode').onclick = () => {
+  document.body.classList.toggle('light');
+};
+</script>
+
+
+</body>
+</html>

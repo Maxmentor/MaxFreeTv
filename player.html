@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MaxFreeTV Player</title>
+
+<link rel="stylesheet" href="https://cdn.plyr.io/1.8.2/plyr.css">
+
+<style>
+body{
+  margin:0;
+  background:black;
+  max-width:1024px;
+  margin:auto;
+}
+</style>
+</head>
+
+<body>
+
+<video id="player" autoplay controls crossorigin></video>
+
+<script src="https://cdn.plyr.io/1.8.2/plyr.js"></script>
+<script src="https://cdn.jsdelivr.net/hls.js/latest/hls.js"></script>
+
+<script>
+const src = new URLSearchParams(location.search).get('src');
+const video = document.getElementById('player');
+
+if (Hls.isSupported()) {
+  const hls = new Hls();
+  hls.loadSource(src);
+  hls.attachMedia(video);
+}
+
+plyr.setup(video);
+</script>
+
+</body>
+</html>

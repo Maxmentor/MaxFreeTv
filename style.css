@@ -1,0 +1,62 @@
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#0b1220;
+  color:white;
+}
+
+body.light{
+  background:#f4f4f4;
+  color:black;
+}
+
+header{
+  text-align:center;
+  padding:15px;
+}
+
+.slogan{
+  display:block;
+  color:rgb(181, 181, 181);
+  text-decoration:none;
+  margin-bottom:8px;
+}
+
+#mode{
+  padding:6px 12px;
+  cursor:pointer;
+}
+
+#search{
+  width:90%;
+  padding:10px;
+  margin:10px auto;
+  display:block;
+  border-radius:8px;
+  border:none;
+}
+
+#channels{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:10px;
+  padding:10px;
+}
+
+.card{
+  background:#1f2937;
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  cursor:pointer;
+}
+
+body.light .card{
+  background:#ddd;
+}
+
+.card img{
+  max-width:80px;
+  height:60px;
+  object-fit:contain;
+}
