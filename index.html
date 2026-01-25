@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>MaxFreeTV</title>
+<title>WorldTV</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -10,7 +10,7 @@
 <body class="dark">
 
 <header>
-  <h1>MaxFreeTV</h1>
+  <h1>IPTV-ORG-SERVER</h1>
   <a class="slogan" href="https://github.com/Maxmentor" target="_blank">
     by Maxmentor
   </a>
@@ -23,69 +23,113 @@
 
 <script>
 let allChannels = [];
+let visibleChannels = [];
+let batchSize = 100;   // Load 100 at a time
+let currentIndex = 0;
 
-// Load the M3U file
+// Load M3U
 fetch('https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/in.m3u')
   .then(res => res.text())
   .then(data => {
     allChannels = parseM3U(data);
-    render(allChannels);
+    loadMore();
   });
 
-// Parse M3U text
+// Parse M3U
 function parseM3U(text) {
   const lines = text.split(/\r?\n/);
   const channels = [];
-  for(let i = 0; i < lines.length; i++) {
+
+  for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    if(line.startsWith('#EXTINF:')) {
-      // Get metadata
-      const info = line.match(/#EXTINF:-?\d+.*?,(.*)/);
-      const name = info ? info[1].trim() : 'No Name';
+
+    if (line.startsWith('#EXTINF:')) {
+      const nameMatch = line.match(/,(.*)/);
+      const name = nameMatch ? nameMatch[1].trim() : 'No Name';
 
       const logoMatch = line.match(/tvg-logo="(.*?)"/);
       const logo = logoMatch ? logoMatch[1] : 'https://www.freeiconspng.com/thumbs/television-icon/tv-icon-13.png';
 
-      // The next line should be the URL
-      const url = lines[i+1] ? lines[i+1].trim() : '';
-      
-      channels.push({ name, logo, url });
-      i++; // skip URL line
+      const url = lines[i + 1] ? lines[i + 1].trim() : '';
+
+      if (url.startsWith('http')) {
+        channels.push({ name, logo, url });
+      }
+
+      i++;
     }
   }
+
   return channels;
 }
 
-// Render channels
-function render(list){
+// Load batch
+function loadMore(){
+  const next = allChannels.slice(currentIndex, currentIndex + batchSize);
+  currentIndex += batchSize;
+  visibleChannels = visibleChannels.concat(next);
+  render(next, true);
+}
+
+// Render
+function render(list, append=false){
   const box = document.getElementById('channels');
-  box.innerHTML = '';
+  if(!append) box.innerHTML = '';
+
+  const fragment = document.createDocumentFragment();
+
   list.forEach(ch => {
     const div = document.createElement('div');
     div.className = 'card';
+
     div.innerHTML = `
       <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/70'">
       <p>${ch.name}</p>
     `;
+
     div.onclick = () => {
       location.href = `player.html?src=${encodeURIComponent(ch.url)}`;
     };
-    box.appendChild(div);
+
+    fragment.appendChild(div);
   });
+
+  box.appendChild(fragment);
 }
 
-// Search filter
-document.getElementById('search').addEventListener('input', e => {
-  const v = e.target.value.toLowerCase();
-  render(allChannels.filter(c => c.name.toLowerCase().includes(v)));
+// Infinite scroll
+window.addEventListener('scroll', () => {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+    if (currentIndex < allChannels.length) {
+      loadMore();
+    }
+  }
 });
 
-// Light/Dark mode toggle
+// Search fast
+document.getElementById('search').addEventListener('input', e => {
+  const value = e.target.value.toLowerCase();
+
+  if(value === ''){
+    currentIndex = 0;
+    visibleChannels = [];
+    document.getElementById('channels').innerHTML = '';
+    loadMore();
+    return;
+  }
+
+  const filtered = allChannels.filter(c =>
+    c.name.toLowerCase().includes(value)
+  );
+
+  render(filtered.slice(0,500)); // limit search result for speed
+});
+
+// Dark/Light
 document.getElementById('mode').onclick = () => {
   document.body.classList.toggle('light');
 };
 </script>
-
 
 </body>
 </html>
