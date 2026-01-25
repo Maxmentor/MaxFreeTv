@@ -42,7 +42,7 @@ function parseM3U(text){
       const name = lines[i].split(",").pop().trim();
 
       const logoMatch = lines[i].match(/tvg-logo="(.*?)"/);
-      const logo = logoMatch ? logoMatch[1] : "https://via.placeholder.com/70";
+      const logo = logoMatch ? logoMatch[1] : "";
 
       const url = lines[i+1]?.trim();
 
@@ -74,7 +74,7 @@ function render(list, append=false){
     div.className="card";
 
     div.innerHTML=`
-      <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/70'">
+      <img src="${ch.logo}" onerror="this.src=''">
       <p>${ch.name}</p>
     `;
 
