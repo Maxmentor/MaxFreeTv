@@ -1,39 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>MaxFreeTV Player</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADVANCE MAX PLAYER</title>
 
-<link rel="stylesheet" href="https://cdn.plyr.io/1.8.2/plyr.css">
+<script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
 
 <style>
-body{
+html,body{
   margin:0;
+  padding:0;
+  height:100%;
+  background:#000;
+}
+#player{
+  width:100%;
+  height:100%;
+  position:fixed;
+  inset:0;
+}
+.loading{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-family:Arial;
   background:black;
-  max-width:1024px;
-  margin:auto;
+  z-index:100;
 }
 </style>
 </head>
 
 <body>
 
-<video id="player" autoplay controls crossorigin></video>
-
-<script src="https://cdn.plyr.io/1.8.2/plyr.js"></script>
-<script src="https://cdn.jsdelivr.net/hls.js/latest/hls.js"></script>
+<div id="player"></div>
+<div class="loading" id="loading">Loading Stream...</div>
 
 <script>
-const src = new URLSearchParams(location.search).get('src');
-const video = document.getElementById('player');
+const params = new URLSearchParams(location.search);
+const streamUrl = params.get("src");
 
-if (Hls.isSupported()) {
-  const hls = new Hls();
-  hls.loadSource(src);
-  hls.attachMedia(video);
+const loading = document.getElementById("loading");
+
+if(!streamUrl){
+  loading.innerText="No stream provided!";
+}else{
+
+  loading.remove();
+
+  new Clappr.Player({
+    parentId:"#player",
+    source: streamUrl,
+    autoPlay:true,
+    width:"100%",
+    height:"100%",
+    mimeType:"application/x-mpegURL",
+    playback:{
+      hlsjsConfig:{
+        maxBufferLength:30,
+        maxMaxBufferLength:60
+      }
+    }
+  });
 }
-
-plyr.setup(video);
 </script>
 
 </body>
