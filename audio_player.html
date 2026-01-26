@@ -9,130 +9,155 @@
 body{
   margin:0;
   height:100vh;
-  background:linear-gradient(160deg,#020617,#0b1220,#020617);
-  font-family:system-ui,Arial;
+  background:#020617;
   display:flex;
   justify-content:center;
   align-items:center;
-  color:#fff;
+  font-family:system-ui,Arial;
+  color:white;
 }
 
-.player{
-  width:95%;
-  max-width:430px;
-  background:rgba(17,24,39,.85);
-  backdrop-filter:blur(10px);
-  border-radius:28px;
-  padding:25px;
-  text-align:center;
-  box-shadow:0 25px 60px rgba(0,0,0,.7);
+.device{
+  width:280px;
+  height:560px;
+  background:linear-gradient(180deg,#1f2937,#020617);
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 30px 80px rgba(0,0,0,.9);
+  display:flex;
+  flex-direction:column;
 }
 
-.cover{
-  width:160px;
-  height:160px;
-  border-radius:50%;
-  background:#000;
+.album{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.album img{
+  width:190px;
+  height:190px;
+  border-radius:12px;
   object-fit:contain;
-  box-shadow:0 0 25px rgba(34,197,94,.6);
-  animation:spin 10s linear infinite;
-  animation-play-state:paused;
+  background:#000;
+  box-shadow:0 0 25px rgba(0,0,0,.8);
 }
 
-.playing{
-  animation-play-state:running;
+.info{
+  text-align:center;
+  margin:10px 0;
 }
 
-@keyframes spin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
-}
-
-h2{
-  font-size:20px;
-  margin:18px 0 8px;
+.info h3{
+  margin:5px 0;
+  font-size:18px;
   color:#22c55e;
 }
 
-.status{
-  font-size:14px;
+.info p{
+  font-size:13px;
   color:#9ca3af;
 }
 
-.wave{
-  display:flex;
-  justify-content:center;
-  gap:5px;
-  margin:25px 0;
+.progress{
+  margin:10px 0;
 }
 
-.wave span{
-  width:6px;
-  height:25px;
+.bar-bg{
+  width:100%;
+  height:5px;
+  background:#1f2937;
+  border-radius:5px;
+  overflow:hidden;
+}
+
+.bar{
+  height:100%;
+  width:0%;
   background:#22c55e;
-  border-radius:10px;
-  animation:wave 1s infinite ease-in-out;
-  opacity:.4;
 }
 
-.wave span:nth-child(2){animation-delay:.1s}
-.wave span:nth-child(3){animation-delay:.2s}
-.wave span:nth-child(4){animation-delay:.3s}
-.wave span:nth-child(5){animation-delay:.4s}
-
-@keyframes wave{
-  0%,100%{height:10px}
-  50%{height:35px}
+.time{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:#9ca3af;
+  margin-top:4px;
 }
 
 .controls{
   display:flex;
-  justify-content:center;
-  gap:35px;
+  justify-content:space-around;
+  margin-top:18px;
 }
 
-.btn{
-  width:75px;
-  height:75px;
+.controls button{
+  width:55px;
+  height:55px;
   border-radius:50%;
   border:none;
-  font-size:28px;
+  font-size:20px;
+  background:#111827;
+  color:white;
+  box-shadow:0 0 15px rgba(0,0,0,.7);
   cursor:pointer;
-  background:linear-gradient(135deg,#22c55e,#4ade80);
-  color:#000;
-  box-shadow:0 10px 25px rgba(34,197,94,.5);
+}
+
+.play{
+  background:#22c55e !important;
+  color:#000 !important;
+  width:70px !important;
+  height:70px !important;
+  font-size:26px !important;
 }
 
 .back{
-  display:block;
-  margin-top:20px;
-  text-decoration:none;
+  text-align:center;
+  margin-top:12px;
+  font-size:13px;
+}
+
+.back a{
   color:#9ca3af;
-  font-size:14px;
+  text-decoration:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="player">
+<div class="device">
 
-<img id="cover" class="cover"
-src="https://cdn-icons-png.flaticon.com/512/7581/7581950.png">
+<div class="album">
+<img id="cover" src="https://github.com/Maxmentor/MaxFreeTv/blob/main/tvlogo.png?raw=true">
+</div>
 
-<h2 id="name">Loading...</h2>
-<div class="status" id="status">Connecting stream</div>
+<div class="info">
+<h3 id="title">Live Radio</h3>
+<p id="status">Connecting...</p>
+</div>
 
-<div class="wave" id="wave">
-  <span></span><span></span><span></span><span></span><span></span>
+<div class="progress">
+  <div class="bar-bg">
+    <div class="bar" id="bar"></div>
+  </div>
+  <div class="time">
+    <span>LIVE</span>
+    <span>∞</span>
+  </div>
 </div>
 
 <div class="controls">
-  <button class="btn" id="playBtn">▶</button>
-  <button class="btn" id="pauseBtn">⏸</button>
+<button>⏮</button>
+<button id="pauseBtn">⏸</button>
+<button class="play" id="playBtn">▶</button>
+<button>⏭</button>
 </div>
 
-<a class="back" href="radio.html">⬅ Back to Channels</a>
+<div class="back">
+<a href="radio.html">⬅ Back</a>
+</div>
 
 <audio id="audio" autoplay></audio>
 
@@ -143,35 +168,30 @@ const params = new URLSearchParams(location.search);
 const stream = params.get("src");
 
 const audio = document.getElementById("audio");
-const cover = document.getElementById("cover");
+const bar = document.getElementById("bar");
 const status = document.getElementById("status");
-const nameBox = document.getElementById("name");
-const wave = document.getElementById("wave");
 
 if(stream){
   audio.src = stream;
-  nameBox.innerText = "Live Radio";
 }
 
-function play(){
+document.getElementById("playBtn").onclick = ()=>{
   audio.play();
-  cover.classList.add("playing");
-  status.innerText = "Now Playing";
-  wave.style.opacity="1";
-}
+  status.innerText="Playing";
+};
 
-function pause(){
+document.getElementById("pauseBtn").onclick = ()=>{
   audio.pause();
-  cover.classList.remove("playing");
-  status.innerText = "Paused";
-  wave.style.opacity=".3";
-}
+  status.innerText="Paused";
+};
 
-document.getElementById("playBtn").onclick = play;
-document.getElementById("pauseBtn").onclick = pause;
-
-audio.onplay = play;
-audio.onpause = pause;
+// Fake live progress animation
+setInterval(()=>{
+  let w = parseInt(bar.style.width) || 0;
+  w += 1.5;
+  if(w>100) w=0;
+  bar.style.width = w+"%";
+},200);
 </script>
 
 </body>
