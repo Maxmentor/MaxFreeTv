@@ -2,81 +2,112 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Live Radio Player</title>
+<title>Radio Player</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
   margin:0;
-  background:#020617;
-  color:white;
+  height:100vh;
+  background:linear-gradient(160deg,#020617,#0b1220,#020617);
   font-family:system-ui,Arial;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  color:#fff;
 }
 
-.player-box{
-  width:94%;
-  max-width:420px;
-  background:#111827;
-  padding:22px;
-  border-radius:20px;
+.player{
+  width:95%;
+  max-width:430px;
+  background:rgba(17,24,39,.85);
+  backdrop-filter:blur(10px);
+  border-radius:28px;
+  padding:25px;
   text-align:center;
-  box-shadow:0 0 25px rgba(0,0,0,0.7);
+  box-shadow:0 25px 60px rgba(0,0,0,.7);
 }
 
-.player-box img{
-  width:120px;
-  height:120px;
+.cover{
+  width:160px;
+  height:160px;
   border-radius:50%;
   background:#000;
   object-fit:contain;
-  margin-bottom:15px;
+  box-shadow:0 0 25px rgba(34,197,94,.6);
+  animation:spin 10s linear infinite;
+  animation-play-state:paused;
 }
 
-.player-box h2{
-  font-size:18px;
+.playing{
+  animation-play-state:running;
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+
+h2{
+  font-size:20px;
+  margin:18px 0 8px;
   color:#22c55e;
-  margin-bottom:20px;
+}
+
+.status{
+  font-size:14px;
+  color:#9ca3af;
+}
+
+.wave{
+  display:flex;
+  justify-content:center;
+  gap:5px;
+  margin:25px 0;
+}
+
+.wave span{
+  width:6px;
+  height:25px;
+  background:#22c55e;
+  border-radius:10px;
+  animation:wave 1s infinite ease-in-out;
+  opacity:.4;
+}
+
+.wave span:nth-child(2){animation-delay:.1s}
+.wave span:nth-child(3){animation-delay:.2s}
+.wave span:nth-child(4){animation-delay:.3s}
+.wave span:nth-child(5){animation-delay:.4s}
+
+@keyframes wave{
+  0%,100%{height:10px}
+  50%{height:35px}
 }
 
 .controls{
   display:flex;
   justify-content:center;
-  gap:25px;
+  gap:35px;
 }
 
-.controls button{
-  width:65px;
-  height:65px;
+.btn{
+  width:75px;
+  height:75px;
   border-radius:50%;
   border:none;
-  font-size:24px;
+  font-size:28px;
   cursor:pointer;
-  background:#22c55e;
+  background:linear-gradient(135deg,#22c55e,#4ade80);
   color:#000;
+  box-shadow:0 10px 25px rgba(34,197,94,.5);
 }
 
-.progress{
-  width:100%;
-  height:6px;
-  background:#1f2937;
-  border-radius:10px;
-  margin:18px 0;
-  overflow:hidden;
-}
-
-.fill{
-  height:100%;
-  width:0%;
-  background:#22c55e;
-}
-
-.back-btn{
-  color:#9ca3af;
+.back{
+  display:block;
+  margin-top:20px;
   text-decoration:none;
+  color:#9ca3af;
   font-size:14px;
 }
 </style>
@@ -84,57 +115,63 @@ body{
 
 <body>
 
-<div class="player-box">
+<div class="player">
 
-<img id="logo" 
-src="https://github.com/Maxmentor/MaxFreeTv/blob/main/tvlogo.png?raw=true">
+<img id="cover" class="cover"
+src="https://cdn-icons-png.flaticon.com/512/7581/7581950.png">
 
-<h2 id="channelName">Loading Stream...</h2>
+<h2 id="name">Loading...</h2>
+<div class="status" id="status">Connecting stream</div>
+
+<div class="wave" id="wave">
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
 
 <div class="controls">
-  <button onclick="playAudio()">▶</button>
-  <button onclick="pauseAudio()">⏸</button>
+  <button class="btn" id="playBtn">▶</button>
+  <button class="btn" id="pauseBtn">⏸</button>
 </div>
 
-<div class="progress">
-  <div class="fill" id="fill"></div>
-</div>
-
-<a class="back-btn" href="index.html">⬅ Back</a>
+<a class="back" href="index.html">⬅ Back to Channels</a>
 
 <audio id="audio" autoplay></audio>
 
 </div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(location.search);
 const stream = params.get("src");
 
 const audio = document.getElementById("audio");
-const fill = document.getElementById("fill");
-const nameBox = document.getElementById("channelName");
+const cover = document.getElementById("cover");
+const status = document.getElementById("status");
+const nameBox = document.getElementById("name");
+const wave = document.getElementById("wave");
 
 if(stream){
   audio.src = stream;
-  nameBox.innerText = "Live Radio Playing";
+  nameBox.innerText = "Live Radio";
 }
 
-function playAudio(){
+function play(){
   audio.play();
+  cover.classList.add("playing");
+  status.innerText = "Now Playing";
+  wave.style.opacity="1";
 }
 
-function pauseAudio(){
+function pause(){
   audio.pause();
+  cover.classList.remove("playing");
+  status.innerText = "Paused";
+  wave.style.opacity=".3";
 }
 
-// Animated progress for live stream
-setInterval(()=>{
-  let w = parseInt(fill.style.width) || 0;
-  w += 3;
-  if(w > 100) w = 0;
-  fill.style.width = w + "%";
-},250);
+document.getElementById("playBtn").onclick = play;
+document.getElementById("pauseBtn").onclick = pause;
 
+audio.onplay = play;
+audio.onpause = pause;
 </script>
 
 </body>
