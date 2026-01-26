@@ -38,7 +38,7 @@ body{
 .album img{
   width:190px;
   height:190px;
-  border-radius:12px;
+  border-radius:14px;
   object-fit:contain;
   background:#000;
   box-shadow:0 0 25px rgba(0,0,0,.8);
@@ -61,7 +61,7 @@ body{
 }
 
 .progress{
-  margin:10px 0;
+  margin:12px 0;
 }
 
 .bar-bg{
@@ -88,39 +88,31 @@ body{
 
 .controls{
   display:flex;
-  justify-content:space-around;
-  margin-top:18px;
+  justify-content:center;
+  margin-top:22px;
 }
 
-.controls button{
-  width:55px;
-  height:55px;
+.play-btn{
+  width:75px;
+  height:75px;
   border-radius:50%;
   border:none;
-  font-size:20px;
-  background:#111827;
-  color:white;
-  box-shadow:0 0 15px rgba(0,0,0,.7);
+  font-size:28px;
+  background:#22c55e;
+  color:#000;
+  box-shadow:0 10px 25px rgba(34,197,94,.6);
   cursor:pointer;
-}
-
-.play{
-  background:#22c55e !important;
-  color:#000 !important;
-  width:70px !important;
-  height:70px !important;
-  font-size:26px !important;
 }
 
 .back{
   text-align:center;
-  margin-top:12px;
-  font-size:13px;
+  margin-top:18px;
 }
 
 .back a{
   color:#9ca3af;
   text-decoration:none;
+  font-size:13px;
 }
 </style>
 </head>
@@ -130,7 +122,8 @@ body{
 <div class="device">
 
 <div class="album">
-<img id="cover" src="https://github.com/Maxmentor/MaxFreeTv/blob/main/tvlogo.png?raw=true">
+<img id="cover" 
+src="https://images.vexels.com/media/users/3/153286/isolated/preview/99b4727883865307f95511eb26383cbc-portable-radio-flat-icon.png">
 </div>
 
 <div class="info">
@@ -149,10 +142,7 @@ body{
 </div>
 
 <div class="controls">
-<button>⏮</button>
-<button id="pauseBtn">⏸</button>
-<button class="play" id="playBtn">▶</button>
-<button>⏭</button>
+<button class="play-btn" id="toggleBtn">▶</button>
 </div>
 
 <div class="back">
@@ -168,24 +158,33 @@ const params = new URLSearchParams(location.search);
 const stream = params.get("src");
 
 const audio = document.getElementById("audio");
-const bar = document.getElementById("bar");
+const btn = document.getElementById("toggleBtn");
 const status = document.getElementById("status");
+const bar = document.getElementById("bar");
 
 if(stream){
   audio.src = stream;
 }
 
-document.getElementById("playBtn").onclick = ()=>{
-  audio.play();
+btn.onclick = ()=>{
+  if(audio.paused){
+    audio.play();
+  }else{
+    audio.pause();
+  }
+};
+
+audio.onplay = ()=>{
+  btn.innerHTML="⏸";
   status.innerText="Playing";
 };
 
-document.getElementById("pauseBtn").onclick = ()=>{
-  audio.pause();
+audio.onpause = ()=>{
+  btn.innerHTML="▶";
   status.innerText="Paused";
 };
 
-// Fake live progress animation
+// Live progress animation
 setInterval(()=>{
   let w = parseInt(bar.style.width) || 0;
   w += 1.5;
