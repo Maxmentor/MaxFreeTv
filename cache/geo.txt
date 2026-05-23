@@ -1,0 +1,1 @@
+http://geoiptv.one:8880/get.php?username=2fd53ce1&password=2bc63aa3&type=.m3u
